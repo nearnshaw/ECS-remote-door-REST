@@ -78,6 +78,10 @@ doorRouter.get("/open", function(req: express.Request, res: express.Response) {
   res.status(200).json(doorOpen)
 });
 
+doorRouter.get("/state", function(req: express.Request, res: express.Response) {
+  res.status(200).json(doorOpen)
+});
+
 // //
 // // get one pixel by {x,y}
 // // GET /api/pixels/pixel/?x=0&y=0

@@ -57,6 +57,7 @@ var __values = (this && this.__values) || function (o) {
         }
     };
 };
+///// Custom components
 define("game", ["require", "exports"], function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
@@ -77,6 +78,10 @@ define("game", ["require", "exports"], function (require, exports) {
     }());
     exports.DoorState = DoorState;
     var doors = engine.getComponentGroup(Transform, DoorState);
+    // how often to refresh scene, in seconds
+    var refreshInterval = 1;
+    var refreshTimer = refreshInterval;
+    //// Systems
     var RotatorSystem = /** @class */ (function () {
         function RotatorSystem() {
         }
@@ -110,6 +115,23 @@ define("game", ["require", "exports"], function (require, exports) {
         return RotatorSystem;
     }());
     exports.RotatorSystem = RotatorSystem;
+    // Add system to engine
+    engine.addSystem(new RotatorSystem());
+    var CheckServer = /** @class */ (function () {
+        function CheckServer() {
+        }
+        CheckServer.prototype.update = function (dt) {
+            refreshTimer -= dt;
+            if (refreshTimer < 0) {
+                refreshTimer = refreshInterval;
+                getFromServer();
+            }
+        };
+        return CheckServer;
+    }());
+    exports.CheckServer = CheckServer;
+    engine.addSystem(new CheckServer());
+    /////// Add scenery
     var doorMaterial = new Material();
     doorMaterial.albedoColor = Color3.Red();
     doorMaterial.metallic = 0.9;
@@ -152,13 +174,13 @@ define("game", ["require", "exports"], function (require, exports) {
     engine.addEntity(wall2);
     engine.addEntity(doorPivot);
     engine.addEntity(door);
-    // Add system to engine
-    engine.addSystem(new RotatorSystem());
+    ///// Connect to the REST API
     var apiUrl = "http://127.0.0.1:7753";
     var headers = {
         Accept: "application/json",
         "Content-Type": "application/json"
     };
+    // function called when activating door
     function callAPI(closed) {
         var _this = this;
         var url;
@@ -168,8 +190,6 @@ define("game", ["require", "exports"], function (require, exports) {
         else {
             url = apiUrl + "/api/door/open";
         }
-        var method = "POST";
-        var body = "";
         executeTask(function () { return __awaiter(_this, void 0, void 0, function () {
             var response, json, _a;
             return __generator(this, function (_b) {
@@ -183,7 +203,6 @@ define("game", ["require", "exports"], function (require, exports) {
                     case 2:
                         json = _b.sent();
                         log("sent request to API" + closed);
-                        log(json);
                         return [3 /*break*/, 4];
                     case 3:
                         _a = _b.sent();
@@ -209,29 +228,32 @@ define("game", ["require", "exports"], function (require, exports) {
         //       }) 
         //   })
     }
+    function getFromServer() {
+        var _this = this;
+        var url = apiUrl + "/api/door/state";
+        executeTask(function () { return __awaiter(_this, void 0, void 0, function () {
+            var response, json, _a;
+            return __generator(this, function (_b) {
+                switch (_b.label) {
+                    case 0:
+                        _b.trys.push([0, 3, , 4]);
+                        return [4 /*yield*/, fetch(url)];
+                    case 1:
+                        response = _b.sent();
+                        return [4 /*yield*/, response.json()];
+                    case 2:
+                        json = _b.sent();
+                        log("sent request to API");
+                        log(JSON.parse(json));
+                        doorPivot.get(DoorState).closed = json;
+                        return [3 /*break*/, 4];
+                    case 3:
+                        _a = _b.sent();
+                        log("failed to reach URL");
+                        return [3 /*break*/, 4];
+                    case 4: return [2 /*return*/];
+                }
+            });
+        }); });
+    }
 });
-// function syncDoor(){
-//     // GET door state
-//     fetch(apiUrl)
-//       .then(res => res.json())
-//       .then(function(res) {
-//         const { wallBlockColors } = scene.state;
-//         Object.keys(wallBlockColors).forEach(function(blockKey) {
-//           const isColorSet = res.some((pixel: IDBPixel) => {
-//             const { x, y, color } = pixel;
-//             const pixelKey = `${x}-${y}`;
-//             if (pixelKey === blockKey) {
-//               wallBlockColors[blockKey] = color;
-//               return true;
-//             }
-//             return false;
-//           });
-//           if (isColorSet === false) {
-//             wallBlockColors[blockKey] = "transparent";
-//           }
-//         });
-//         scene.setState({ wallBlockColors });
-//       })
-//       .catch(err => error("error getting all pixels", err));
-//   }
-// }

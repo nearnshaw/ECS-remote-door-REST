@@ -1,3 +1,7 @@
+///// Custom components
+
+
+
 @Component('doorState')
 export class DoorState {
   closed: boolean = true
@@ -11,6 +15,12 @@ export class DoorState {
 }
 
 const doors = engine.getComponentGroup(Transform, DoorState)
+
+// how often to refresh scene, in seconds
+const refreshInterval: number = 1
+let refreshTimer: number = refreshInterval
+
+//// Systems
 
 export class RotatorSystem implements ISystem {
  
@@ -32,6 +42,23 @@ export class RotatorSystem implements ISystem {
   }
 }
 
+// Add system to engine
+engine.addSystem(new RotatorSystem())
+
+export class CheckServer implements ISystem {
+  update(dt:number){
+    refreshTimer -= dt
+    if (refreshTimer <0){
+      refreshTimer = refreshInterval
+      getFromServer()
+    }
+  }
+
+}
+engine.addSystem(new CheckServer())
+
+
+/////// Add scenery
 
 const doorMaterial = new Material()
 doorMaterial.albedoColor = Color3.Red()
@@ -85,8 +112,8 @@ engine.addEntity(wall2)
 engine.addEntity(doorPivot)
 engine.addEntity(door)
 
-// Add system to engine
-engine.addSystem(new RotatorSystem())
+
+///// Connect to the REST API
 
 const apiUrl = "http://127.0.0.1:7753"
 
@@ -95,6 +122,7 @@ const headers = {
   "Content-Type": "application/json"
 };
 
+// function called when activating door
 function callAPI(closed: boolean){
   let url
   if (closed){
@@ -103,17 +131,12 @@ function callAPI(closed: boolean){
   else {
     url = `${apiUrl}/api/door/open`
   }
-  
-  let method = "POST"
-  let body = ""
-  
 
   executeTask(async () => {
     try {
       let response = await fetch(url)
       let json = await response.json()
       log("sent request to API" + closed)
-      log(json)
     } catch {
       log("failed to reach URL")
     }
@@ -138,34 +161,50 @@ function callAPI(closed: boolean){
 }
 
 
-// function syncDoor(){
+function getFromServer(){
  
-//     // GET door state
-//     fetch(apiUrl)
-//       .then(res => res.json())
-//       .then(function(res) {
-//         const { wallBlockColors } = scene.state;
+  let url = `${apiUrl}/api/door/state`
+  
+  executeTask(async () => {
+    try {
+      let response = await fetch(url)
+      let json = await response.json()
+      log("sent request to API")
+      log(JSON.parse(json))
+      
+      doorPivot.get(DoorState).closed = json
+      //log(json.doorOpen)
+      
+    } catch {
+      log("failed to reach URL")
+    }
 
-//         Object.keys(wallBlockColors).forEach(function(blockKey) {
-//           const isColorSet = res.some((pixel: IDBPixel) => {
-//             const { x, y, color } = pixel;
-//             const pixelKey = `${x}-${y}`;
+  //   // GET door state
+  //   fetch(apiUrl)
+  //     .then(res => res.json())
+  //     .then(function(res) {
+  //       const { wallBlockColors } = scene.state;
 
-//             if (pixelKey === blockKey) {
-//               wallBlockColors[blockKey] = color;
-//               return true;
-//             }
+  //       Object.keys(wallBlockColors).forEach(function(blockKey) {
+  //         const isColorSet = res.some((pixel: IDBPixel) => {
+  //           const { x, y, color } = pixel;
+  //           const pixelKey = `${x}-${y}`;
 
-//             return false;
-//           });
+  //           if (pixelKey === blockKey) {
+  //             wallBlockColors[blockKey] = color;
+  //             return true;
+  //           }
 
-//           if (isColorSet === false) {
-//             wallBlockColors[blockKey] = "transparent";
-//           }
-//         });
+  //           return false;
+  //         });
 
-//         scene.setState({ wallBlockColors });
-//       })
-//       .catch(err => error("error getting all pixels", err));
-//   }
-// }
+  //         if (isColorSet === false) {
+  //           wallBlockColors[blockKey] = "transparent";
+  //         }
+  //       });
+
+  //       scene.setState({ wallBlockColors });
+  //     })
+  //     .catch(err => error("error getting all pixels", err));
+   })
+}
