@@ -154,11 +154,11 @@ function getFromServer(){
       let response = await fetch(url)
       let json = await response.json()
       log("sent request to API")
-      //log(json.doorOpen)
-      //let r = JSON.parse(json)
+      //log(json.state)
+      //let r = await JSON.parse(json)
       //log(json.doorOpen)
       //log(r)
-      doorPivot.get(DoorState).closed = json.doorOpen
+      doorPivot.get(DoorState).closed = json.state
       
       
     } catch {

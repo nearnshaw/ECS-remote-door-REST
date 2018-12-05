@@ -229,11 +229,11 @@ define("game", ["require", "exports"], function (require, exports) {
                     case 2:
                         json = _b.sent();
                         log("sent request to API");
-                        //log(json.doorOpen)
-                        //let r = JSON.parse(json)
+                        //log(json.state)
+                        //let r = await JSON.parse(json)
                         //log(json.doorOpen)
                         //log(r)
-                        doorPivot.get(DoorState).closed = json.doorOpen;
+                        doorPivot.get(DoorState).closed = json.state;
                         return [3 /*break*/, 4];
                     case 3:
                         _a = _b.sent();
