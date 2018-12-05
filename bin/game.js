@@ -164,8 +164,7 @@ define("game", ["require", "exports"], function (require, exports) {
     door.get(BoxShape).withCollisions = true;
     door.set(new OnClick(function (_) {
         var state = doorPivot.get(DoorState);
-        state.closed = !state.closed;
-        callAPI(state.closed);
+        callAPI(!state.closed);
     }));
     // Set the door as a child of doorPivot
     door.setParent(doorPivot);
@@ -174,6 +173,7 @@ define("game", ["require", "exports"], function (require, exports) {
     engine.addEntity(wall2);
     engine.addEntity(doorPivot);
     engine.addEntity(door);
+    log("children", doorPivot.children);
     ///// Connect to the REST API
     var apiUrl = "http://127.0.0.1:7753";
     var headers = {
@@ -202,7 +202,7 @@ define("game", ["require", "exports"], function (require, exports) {
                         return [4 /*yield*/, response.json()];
                     case 2:
                         json = _b.sent();
-                        log("sent request to API" + closed);
+                        log("sent request to API " + closed);
                         return [3 /*break*/, 4];
                     case 3:
                         _a = _b.sent();
@@ -212,6 +212,7 @@ define("game", ["require", "exports"], function (require, exports) {
                 }
             });
         }); });
+        getFromServer();
     }
     function getFromServer() {
         var _this = this;
@@ -229,10 +230,7 @@ define("game", ["require", "exports"], function (require, exports) {
                     case 2:
                         json = _b.sent();
                         log("sent request to API");
-                        //log(json.state)
-                        //let r = await JSON.parse(json)
-                        //log(json.doorOpen)
-                        //log(r)
+                        log(json);
                         doorPivot.get(DoorState).closed = json.state;
                         return [3 /*break*/, 4];
                     case 3:

@@ -98,8 +98,7 @@ door.get(BoxShape).withCollisions = true
 door.set(
   new OnClick(_ => {
     let state = doorPivot.get(DoorState)
-    state.closed = !state.closed
-    callAPI(state.closed)
+    callAPI(!state.closed)
   })
 )
 
@@ -112,6 +111,8 @@ engine.addEntity(wall2)
 engine.addEntity(doorPivot)
 engine.addEntity(door)
 
+
+log("children", doorPivot.children)
 
 ///// Connect to the REST API
 
@@ -136,11 +137,12 @@ function callAPI(closed: boolean){
     try {
       let response = await fetch(url)
       let json = await response.json()
-      log("sent request to API" + closed)
+      log("sent request to API " + closed)
     } catch {
       log("failed to reach URL")
     }
   })
+  getFromServer()
 
 }
 
@@ -154,10 +156,7 @@ function getFromServer(){
       let response = await fetch(url)
       let json = await response.json()
       log("sent request to API")
-      //log(json.state)
-      //let r = await JSON.parse(json)
-      //log(json.doorOpen)
-      //log(r)
+      log(json)
       doorPivot.get(DoorState).closed = json.state
       
       
