@@ -212,21 +212,6 @@ define("game", ["require", "exports"], function (require, exports) {
                 }
             });
         }); });
-        // fetch(url)
-        //   .then(res => res.json())
-        //   .then(function(res) {
-        //     if (res.error !== undefined) {
-        //       return error(url, res.error);
-        //     }
-        //     const keys = Object.keys(res); 
-        //     fetch(url, { method, body, headers })
-        //       .then(res => res.json())
-        //       .then(function(res) {
-        //         if (res.error !== undefined) {
-        //           return error(res.error);
-        //         }
-        //       }) 
-        //   })
     }
     function getFromServer() {
         var _this = this;
@@ -244,8 +229,11 @@ define("game", ["require", "exports"], function (require, exports) {
                     case 2:
                         json = _b.sent();
                         log("sent request to API");
-                        log(JSON.parse(json));
-                        doorPivot.get(DoorState).closed = json;
+                        //log(json.doorOpen)
+                        //let r = JSON.parse(json)
+                        //log(json.doorOpen)
+                        //log(r)
+                        doorPivot.get(DoorState).closed = json.doorOpen;
                         return [3 /*break*/, 4];
                     case 3:
                         _a = _b.sent();

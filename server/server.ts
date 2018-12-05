@@ -16,35 +16,14 @@ const host = "127.0.0.1";
 expressApp.use(cors());
 
 //
-// Store door state
+// Variable to store door state
 //
 
 let doorOpen : boolean = false
 
 
-// //
-// // Pixel schema and model
-// //
-// const pixelSchema = new Schema({
-//   x: {
-//     type: Number,
-//     required: true
-//   },
-//   y: {
-//     type: Number,
-//     required: true
-//   },
-//   color: {
-//     // blank or null means transparent
-//     type: String
-//   }
-// });
-
-// const Pixel = mongoose.model("Pixel", pixelSchema);
-
 //
-// get all pixels
-// GET /api/pixels/
+//POST close door
 //
 doorRouter.get("/close", function(req: express.Request, res: express.Response) {
   // Pixel.find({}, function(err: Error, pixels: Document[]) {
@@ -60,178 +39,22 @@ doorRouter.get("/close", function(req: express.Request, res: express.Response) {
   console.log("CLOSED DOOR")
 
   
-  res.status(200).json(doorOpen)
+  res.status(200).json({"state":doorOpen})
 });
 
-doorRouter.get("/open", function(req: express.Request, res: express.Response) {
-  // Pixel.find({}, function(err: Error, pixels: Document[]) {
-  //   if (err !== undefined && err !== null) {
-  //     const msg = "error getting all pixels";
-  //     console.error(msg, err);
-  //     return res.status(500).json({ error: msg });
-  //   }
+// POST open door
 
-  //   res.status(200).json(pixels);
-  // });
+doorRouter.get("/open", function(req: express.Request, res: express.Response) {
+
   doorOpen = true
   console.log("OPENED DOOR")
-  res.status(200).json(doorOpen)
+  res.status(200).json({"state":doorOpen})
 });
 
 doorRouter.get("/state", function(req: express.Request, res: express.Response) {
-  res.status(200).json(doorOpen)
+  res.status(200).json({"state":doorOpen})
 });
 
-// //
-// // get one pixel by {x,y}
-// // GET /api/pixels/pixel/?x=0&y=0
-// //
-// pixelRouter.get("/pixel", function(
-//   req: express.Request,
-//   res: express.Response
-// ) {
-//   let { x, y } = req.query;
-
-//   if (isNaN(x) === true || isNaN(y) === true) {
-//     const msg = `x or y were not a number, x: ${x}, y: ${y}`;
-//     return res.status(400).json({ error: msg });
-//   }
-
-//   x = parseInt(x);
-//   y = parseInt(y);
-
-//   Pixel.findOne({ x, y }, function(err: Error, pixel: Document) {
-//     if (err !== undefined && err !== null) {
-//       const msg = `error getting one pixel, x: ${x}, y: ${y}`;
-//       console.error(msg, err);
-//       return res.status(500).json({ error: msg });
-//     }
-
-//     res.status(200).json(pixel || {});
-//   });
-// });
-
-// //
-// // put a new pixel which does not exist in the db yet
-// // PUT /api/pixels/pixel
-// //
-// pixelRouter.put("/pixel", bodyParser.json(), function(
-//   req: express.Request,
-//   res: express.Response
-// ) {
-//   let { x, y, color } = req.body;
-
-//   if (isNaN(x) === true || isNaN(y) === true) {
-//     const msg = `x or y were not a number, x: ${x}, y: ${y}`;
-//     return res.status(400).json({ error: msg });
-//   }
-
-//   x = parseInt(x);
-//   y = parseInt(y);
-
-//   if (typeof color !== "string" || validColorPattern.test(color) === false) {
-//     const msg = `the color was not valid hex, color: ${color}`;
-//     console.error(msg);
-//     return res.status(400).json({ error: msg });
-//   }
-
-//   Pixel.findOne({ x, y }, function(err: Error, pixel: Document) {
-//     if (err !== undefined && err !== null) {
-//       const msg = `error getting one pixel for PUT, x: ${x}, y: ${y}`;
-//       console.error(msg, err);
-//       return res.status(500).json({ error: msg });
-//     }
-
-//     if (pixel !== null) {
-//       const msg = `cannot put a pixel where it already exists, try post, x: ${x}, y: ${y}`;
-//       console.error(msg);
-//       return res.status(400).json({ error: msg });
-//     }
-
-//     Pixel.create({ x, y, color }, function(err: Error, pixel: Document) {
-//       if (err !== undefined && err !== null) {
-//         const msg = `error while creating pixel, x: ${x}, y: ${y}, color: ${color}`;
-//         console.error(msg, err);
-//         return res.status(500).json({ error: msg });
-//       }
-
-//       res.status(200).json(pixel);
-//     });
-//   });
-// });
-
-// //
-// // post an existing pixel that we already know about by _id
-// // POST /api/pixels/pixel/:_id
-// //
-// pixelRouter.post("/pixel/:_id", bodyParser.json(), function(
-//   req: express.Request,
-//   res: express.Response
-// ) {
-//   const { _id } = req.params;
-//   const { color } = req.body;
-
-//   if (typeof color !== "string" || validColorPattern.test(color) === false) {
-//     const msg = `the color was not valid hex, color: ${color}`;
-//     console.error(msg);
-//     return res.status(400).json({ error: msg });
-//   }
-
-//   Pixel.findOne({ _id }, function(err: Error, pixel: Document) {
-//     if (err !== undefined && err !== null) {
-//       const msg = `error while getting one pixel for POST, _id: ${_id}, color: ${color}`;
-//       console.error(msg, err);
-//       return res.status(500).json({ error: msg });
-//     }
-
-//     if (pixel === null) {
-//       const msg = `cannot POST to a non-existent pixel _id, _id: ${_id}, color: ${color}`;
-//       console.error(msg);
-//       return res.status(400).json({ error: msg });
-//     }
-
-//     pixel.set("color", color);
-
-//     pixel.save(function(err: Error) {
-//       if (err !== undefined && err !== null) {
-//         const msg = `error while saving one pixel for POST, _id: ${_id}, color: ${color}`;
-//         console.error(msg, err);
-//         return res.status(500).json({ error: msg });
-//       }
-
-//       res.status(200).json(pixel);
-//     });
-//   });
-// });
-
-// //
-// // delete an existing pixel that we know of by _id
-// // DELETE /api/pixels/pixel/:_id
-// //
-// pixelRouter.delete("/pixel/:_id", function(
-//   req: express.Request,
-//   res: express.Response
-// ) {
-//   const { _id } = req.params;
-
-//   Pixel.findById(_id, function(err: Error, pixel: Document) {
-//     if (err !== undefined && err !== null) {
-//       const msg = `could not find document by _id to DELETE, _id: ${_id}`;
-//       console.error(msg, err);
-//       return res.status(500).json({ error: msg });
-//     }
-
-//     Pixel.deleteOne({ _id }, function(err: Error) {
-//       if (err !== undefined && err !== null) {
-//         const msg = `could not delete by _id to DELETE, _id: ${_id}`;
-//         console.error(msg, err);
-//         return res.status(500).json({ error: msg });
-//       }
-
-//       res.status(200).json({ deleted: true });
-//     });
-//   });
-// });
 
 //
 // attach the door REST router

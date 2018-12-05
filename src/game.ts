@@ -142,22 +142,6 @@ function callAPI(closed: boolean){
     }
   })
 
-
-  // fetch(url)
-  //   .then(res => res.json())
-  //   .then(function(res) {
-  //     if (res.error !== undefined) {
-  //       return error(url, res.error);
-  //     }
-  //     const keys = Object.keys(res); 
-  //     fetch(url, { method, body, headers })
-  //       .then(res => res.json())
-  //       .then(function(res) {
-  //         if (res.error !== undefined) {
-  //           return error(res.error);
-  //         }
-  //       }) 
-  //   })
 }
 
 
@@ -170,41 +154,16 @@ function getFromServer(){
       let response = await fetch(url)
       let json = await response.json()
       log("sent request to API")
-      log(JSON.parse(json))
-      
-      doorPivot.get(DoorState).closed = json
       //log(json.doorOpen)
+      //let r = JSON.parse(json)
+      //log(json.doorOpen)
+      //log(r)
+      doorPivot.get(DoorState).closed = json.doorOpen
+      
       
     } catch {
       log("failed to reach URL")
     }
 
-  //   // GET door state
-  //   fetch(apiUrl)
-  //     .then(res => res.json())
-  //     .then(function(res) {
-  //       const { wallBlockColors } = scene.state;
-
-  //       Object.keys(wallBlockColors).forEach(function(blockKey) {
-  //         const isColorSet = res.some((pixel: IDBPixel) => {
-  //           const { x, y, color } = pixel;
-  //           const pixelKey = `${x}-${y}`;
-
-  //           if (pixelKey === blockKey) {
-  //             wallBlockColors[blockKey] = color;
-  //             return true;
-  //           }
-
-  //           return false;
-  //         });
-
-  //         if (isColorSet === false) {
-  //           wallBlockColors[blockKey] = "transparent";
-  //         }
-  //       });
-
-  //       scene.setState({ wallBlockColors });
-  //     })
-  //     .catch(err => error("error getting all pixels", err));
    })
 }
