@@ -8,13 +8,9 @@ export class DoorState {
   openPos: Vector3 = new Vector3(0, 90, 0)
   closedPos: Vector3 = new Vector3(0, 0, 0)
   fraction: number = 0
-
-  constructor(closed : boolean = true){
-    this.closed = closed 
-  }
 }
 
-const doors = engine.getComponentGroup(Transform, DoorState)
+const doors = engine.getComponentGroup(DoorState)
 
 // how often to refresh scene, in seconds
 const refreshInterval: number = 1
@@ -30,13 +26,13 @@ export class RotatorSystem implements ISystem {
       let transform = door.get(Transform)
       
       if (state.closed == false && state.fraction < 1) {
+        state.fraction += dt
         let pos = Vector3.Lerp(state.closedPos, state.openPos, state.fraction)
         transform.rotation.eulerAngles = pos
-        state.fraction += dt/2
       } else if (state.closed == true && state.fraction > 0) {
+        state.fraction -= dt
         let pos = Vector3.Lerp(state.closedPos, state.openPos, state.fraction)
         transform.rotation.eulerAngles = pos
-        state.fraction -= dt/2
       }
     }
   }
@@ -96,9 +92,10 @@ door.set(new BoxShape())
 door.set(doorMaterial)
 door.get(BoxShape).withCollisions = true
 door.set(
-  new OnClick(_ => {
-    let state = doorPivot.get(DoorState)
-    callAPI(!state.closed)
+  new OnClick(e => {
+    let state = door.getParent().get(DoorState)
+    state.closed = !state.closed
+    //log(state.closed)
   })
 )
 
@@ -158,8 +155,7 @@ function getFromServer(){
       log("sent request to API")
       log(json)
       doorPivot.get(DoorState).closed = json.state
-      
-      
+        
     } catch {
       log("failed to reach URL")
     }
