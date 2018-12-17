@@ -5,8 +5,8 @@
 @Component('doorState')
 export class DoorState {
   closed: boolean = true
-  openPos: Vector3 = new Vector3(0, 90, 0)
-  closedPos: Vector3 = new Vector3(0, 0, 0)
+  openPos: Quaternion = Quaternion.Euler(0, 90, 0)
+  closedPos: Quaternion = Quaternion.Euler(0, 0, 0)
   fraction: number = 0
 }
 
@@ -27,12 +27,12 @@ export class RotatorSystem implements ISystem {
       
       if (state.closed == false && state.fraction < 1) {
         state.fraction += dt
-        let pos = Vector3.Lerp(state.closedPos, state.openPos, state.fraction)
-        transform.rotation.eulerAngles = pos
+        let rot = Quaternion.Slerp(state.closedPos, state.openPos, state.fraction)
+        transform.rotation = rot
       } else if (state.closed == true && state.fraction > 0) {
         state.fraction -= dt
-        let pos = Vector3.Lerp(state.closedPos, state.openPos, state.fraction)
-        transform.rotation.eulerAngles = pos
+        let rot = Quaternion.Slerp(state.closedPos, state.openPos, state.fraction)
+        transform.rotation = rot
       }
     }
   }
