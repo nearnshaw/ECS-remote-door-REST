@@ -111,6 +111,7 @@ door.set(
   new OnClick(e => {
     let state = door.getParent().get(DoorState)
     state.closed = !state.closed
+    callAPI(state.closed)
   })
 )
 
@@ -147,7 +148,7 @@ function callAPI(closed: boolean){
 
 }
 
-
+// Function called at regular intervals
 function getFromServer(){
  
   let url = `${apiUrl}/api/door/state`
@@ -166,3 +167,6 @@ function getFromServer(){
 
    })
 }
+
+// Start the scene with the door's state matching the server
+getFromServer()
