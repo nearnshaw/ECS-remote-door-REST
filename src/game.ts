@@ -56,14 +56,16 @@ engine.addSystem(new CheckServer())
 
 /////// Add scenery
 
+let collideBox = new BoxShape()
+collideBox.withCollisions = true
+
 // Define fixed walls
 const wall1 = new Entity()
 wall1.set(new Transform({
   position: new Vector3(5.75, 1, 3),
   scale: new Vector3(1.5, 2, 0.05)
 }))
-wall1.set(new BoxShape())
-wall1.get(BoxShape).withCollisions = true
+wall1.set(collideBox)
 engine.addEntity(wall1)
 
 const wall2 = new Entity()
@@ -71,8 +73,7 @@ wall2.set(new Transform({
   position: new Vector3(3.25, 1, 3),
   scale: new Vector3(1.5, 2, 0.05)
 }))
-wall2.set(new BoxShape())
-wall2.get(BoxShape).withCollisions = true
+wall2.set(collideBox)
 engine.addEntity(wall2)
 
 
@@ -82,8 +83,7 @@ door.set(new Transform({
   position: new Vector3(0.5, 0, 0),
   scale: new Vector3(1, 2, 0.05)
 }))
-door.set(new BoxShape())
-door.get(BoxShape).withCollisions = true
+door.set(collideBox)
 engine.addEntity(door)
 
 // Define a material to color the door red
